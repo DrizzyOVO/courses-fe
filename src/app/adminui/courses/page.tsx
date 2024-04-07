@@ -47,7 +47,7 @@ function PurchasedCourses() {
     useEffect(() => {
 
         const init = async () => {
-            const response = await axios.get(`http://localhost:3000/admin/courses`, {
+            const response = await axios.get(`${process.env.BACKEND_URL}/admin/courses`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }

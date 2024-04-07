@@ -145,7 +145,7 @@ function AddCourse() {
     <div className="p-6 pt-0">
         <button
         onClick={async () => {
-            const response = await axios.post(`http://localhost:3000/admin/createCourse`, {
+            const response = await axios.post(`${process.env.BACKEND_URL}/admin/createCourse`, {
                 title: title,
                 description: description,
                 published: true, 

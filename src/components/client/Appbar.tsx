@@ -23,7 +23,7 @@ function Appbar() {
     useEffect(() => {
         async function smth() {
 
-            const someone = await axios.get("http://localhost:3000/user/me", { 
+            const someone = await axios.get(`${process.env.BACKEND_URL}/user/me`, { 
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("token")
                 }

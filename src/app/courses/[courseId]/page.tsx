@@ -34,7 +34,7 @@ function Course({ params } : {params : any}) {
     useEffect(() => {
       async function smth() {
   
-          const response = await axios.get(`http://localhost:3000/user/courses/${courseId}`, { 
+          const response = await axios.get(`${process.env.BACKEND_URL}/user/courses/${courseId}`, { 
               headers: {
                   "Authorization": "Bearer " + localStorage.getItem("token")
               }
@@ -56,7 +56,7 @@ function Course({ params } : {params : any}) {
 
     const buyCourse = async () => {
 
-      const response = await axios.get(`http://localhost:3000/user/courses/${courseId}/buy`, {
+      const response = await axios.get(`${process.env.BACKEND_URL}/user/courses/${courseId}/buy`, {
         headers: {
           authorization: `Bearer ${localStorage.getItem("token")}`
         }
