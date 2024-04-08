@@ -16,6 +16,7 @@ export default function Home() {
     setUser({
       isUser: true 
     })
+    console.log("url :- " + process.env.NEXT_PUBLIC_BACKEND_URL);
   }); 
 
     return (

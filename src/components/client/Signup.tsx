@@ -51,7 +51,7 @@ return (
 
                                         toast.success("Please hold on, while we connect to our backend"); 
 
-                                        const response = await axios.post(`${process.env.BACKEND_URL}/user/signup`, {
+                                        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/signup`, {
                                             email: email,
                                             password: password
                                         })

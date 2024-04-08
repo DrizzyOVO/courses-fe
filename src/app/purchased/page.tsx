@@ -14,7 +14,7 @@ function PurchasedCourses() {
     const setUser = useSetRecoilState(userState); 
 
     const init = async () => {
-        const response = await axios.get(`${process.env.BACKEND_URL}/user/purchasedCourses`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/purchasedCourses`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }

@@ -25,7 +25,7 @@ function Courses() {
     const setTheCourse = useSetRecoilState(courseState); 
 
     const init = async () => {
-        const response = await axios.get(`${process.env.BACKEND_URL}/user/courses`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }

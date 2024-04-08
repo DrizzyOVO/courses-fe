@@ -43,7 +43,7 @@ function Course({ params } : {params : any}) {
         setTimeout(() => {
         async function smth() {
             console.log(courseId);  
-            const response = await axios.get(`${process.env.BACKEND_URL}/admin/courses/${courseId}`, { 
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/courses/${courseId}`, { 
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("token")
                 }
@@ -160,7 +160,7 @@ function UpdateCard({courseId} : {courseId: string}) {
             // bg-gradient-to-tr
                 className="block w-64 select-none rounded-2xl bg-gradient-to-tr from-indigo-700 to-indigo-500 py-3 px-6 text-center align-middle font-sans text-lg font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                 onClick={async () => {
-                    const response = await axios.put(`${process.env.BACKEND_URL}/admin/courses/` + courseDetails?.course?.id, {
+                    const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/courses/` + courseDetails?.course?.id, {
                         title: title,
                         description: description,
                         imgLink: String(image),

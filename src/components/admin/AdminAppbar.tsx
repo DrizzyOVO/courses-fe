@@ -20,7 +20,7 @@ function AdminAppbar() {
     useEffect(() => {
         async function smth() {
 
-            const someone = await axios.get(`${process.env.BACKEND_URL}/admin/me`, { 
+            const someone = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/me`, { 
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("token")
                 }
