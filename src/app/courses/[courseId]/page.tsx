@@ -8,9 +8,11 @@ import axios from "axios";
 import { courseState, courseInterface } from "@/store/atoms/course";
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import { courseTitle, coursePrice, isCourseLoading, courseDescription } from "@/store/selectors/course";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Image from 'next/image'
 import Appbar from "@/components/client/Appbar";
+import { userEmailState } from "@/store/selectors/userEmail";
+import { checkout } from "../../checkout"
 
 
 interface Course {
@@ -30,21 +32,22 @@ function Course({ params } : {params : any}) {
     const [bought, setBought] = useState(false); 
     const [course, setCourse] = useState<Course>(); 
     const courseLoading = useRecoilValue(isCourseLoading);
+    const userEmail = useRecoilValue(userEmailState)
+    const [isLoading, setIsLoading] = useState(true); 
 
     useEffect(() => {
       async function smth() {
+
+          console.log("courseId :- " + courseId);
+
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/${userEmail}`);
   
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}`, { 
-              headers: {
-                  "Authorization": "Bearer " + localStorage.getItem("token")
-              }
-          }); 
-  
-          if(response.data.message == "course found") { 
-            setUserid(response.data.userId); 
-            setCourse(response.data.course); 
-            setUser(response.data.theUser); 
-            console.log(response.data.course); 
+          if(response?.data.message == "course found") { 
+            setUserid(response?.data.userId); 
+            setCourse(response?.data.course); 
+            setUser(response?.data.theUser); 
+            setIsLoading(false); 
+            console.log("course :- " + response?.data.course); 
             console.log(course);
             console.log("title :- " + course?.title); 
           }
@@ -56,24 +59,29 @@ function Course({ params } : {params : any}) {
 
     const buyCourse = async () => {
 
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/buy`, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${courseId}/buy`, {
+        email: userEmail
+      }, {
         headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`
+            "Content-type": "application/json"
         }
-      }); 
+    }); 
   
-      if(response.data.message == "Bought it") {  
+      if(response?.data.message == "Bought it") {  
         setBought(true); 
         router.push(`/courses/${courseId}/purchased`); 
       }
   
-      // router.push(`http://localhost:3000/courses/${courseId}/${userid}`); 
-  
     }
 
+    if(isLoading) { 
+      <div>
+        Loading...
+      </div>
+    }
 
     return (
-
+      
       <>
       {/* <Appbar />  */}
       <div className="z-10">
@@ -94,17 +102,40 @@ function Course({ params } : {params : any}) {
             {
               user ? 
               <h3>You purchased this course</h3> : 
-              <form action={buyCourse}>
+              // <form action={buyCourse}>
                 <button
                   className="align-middle select-none font-sans font-bold text-center text-xl mt-5 mb-5 uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg bg-indigo-500 text-white shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none" 
                   type="submit"
+                  onClick={ () => {
+                    let key = ""
+                    if (course?.title == "Ui/Ux") { 
+                      key = `${process.env.NEXT_PUBLIC_UI_UX}`
+                    } else if (course?.title == "LaFerrari") { 
+                      key = `${process.env.NEXT_PUBLIC_LAFERRARI}`
+                    } else { 
+                      key = `${process.env.NEXT_PUBLIC_WEBSITE_DEVELOPMENT}`
+                    }
+                    // buyCourse();
+                    checkout({
+                      lineItems: [
+                        {
+                          price: key,
+                          quantity: 1
+                        }
+                      ]
+                    }) 
+
+                    buyCourse();
+ 
+                  }}
+
                 >Buy</button> 
-              </form>
+              // </form>
             } 
           </div>
-          {/* <div style={{ display: "flex", justifyContent: "center" }}>
-            <h1>{userid ? "yesss" : "Nooooo"}</h1>
-          </div> */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <h1>use <span className="text-indigo-600 font-bold">4242 4242 4242 4242</span> in card section while buying for testing purpose!</h1>
+          </div>
         </div>
     </div>
     </>
@@ -159,13 +190,10 @@ function Price({ price }: { price: Number }) {
             Price
         </Typography>
         <Typography variant="subtitle1">
-            <b>Rs {price?.toString()}</b>
+            <b>$ {price?.toString()}</b>
         </Typography>
     </>
 }
 
 export default Course;
 
-
-
-// onClick={() => buyCourse(String(course?.id))}

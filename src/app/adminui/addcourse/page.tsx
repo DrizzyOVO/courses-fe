@@ -5,6 +5,10 @@ import {Card, responsiveFontSizes} from "@mui/material";
 import {useState} from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { userEmailState } from "@/store/selectors/userEmail";
+import { useRecoilValue } from "recoil";
+import toast from "react-hot-toast";
+import { adminEmailState } from "@/store/selectors/adminEmail";
 
 
 function AddCourse() {
@@ -14,67 +18,7 @@ function AddCourse() {
     const [price, setPrice] = useState(0); 
     const [imgLink, setImgLink] = useState(""); 
     const router = useRouter(); 
-
-    // return <div style={{display: "flex", justifyContent: "center", minHeight: "80vh", flexDirection: "column"}}>
-    //     <div style={{display: "flex", justifyContent: "center"}}>
-    //         <Card style={{width: 400, padding: 20, marginTop: 30, height: "100%", borderRadius: "30px"}}>
-    //             <TextField
-    //                 style={{marginBottom: 10}}
-    //                 onChange={(e) => {
-    //                     setTitle(e.target.value)
-    //                 }}
-    //                 fullWidth={true}
-    //                 label="Title"
-    //                 variant="outlined"
-    //             />
-
-    //             <TextField
-    //                 style={{marginBottom: 10}}
-    //                 onChange={(e) => {
-    //                     setDescription(e.target.value)
-    //                 }}
-    //                 fullWidth={true}
-    //                 label="Description"
-    //                 variant="outlined"
-    //             />
-
-    //             <TextField
-    //                 style={{marginBottom: 10}}
-    //                 onChange={(e) => {
-    //                     {Number.isNaN(price) ? setPrice(0) : setPrice(parseInt((e.target.value)))}
-    //                 }}
-    //                 fullWidth={true}
-    //                 label="Price"
-    //                 variant="outlined"
-    //             />
-
-    //             <Button
-    //                 size={"large"}
-    //                 // variant="contained"
-    //                 onClick={async () => {
-    //                     const response = await axios.post(`http://localhost:5000/admin/createCourse`, {
-    //                         title: title,
-    //                         description: description,
-    //                         published: true,
-    //                         price: price 
-    //                     }, {
-    //                         headers: {
-    //                             "Content-type": "application/json",
-    //                             "Authorization": "Bearer " + localStorage.getItem("token")
-    //                         }
-    //                     });
-
-    //                     if(response){ 
-    //                         // window.alert("Added course!");
-    //                         router.push("/addcourse/courseadded")
-    //                     }
-
-    //                 }}
-    //             > Add course</Button>
-    //         </Card>
-    //     </div>
-    // </div>
-
+    const adminEmail = useRecoilValue(adminEmailState); 
 
     return <div className='flex justify-center'>
 
@@ -145,28 +89,28 @@ function AddCourse() {
     <div className="p-6 pt-0">
         <button
         onClick={async () => {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/createCourse`, {
+            const response = adminEmail ? await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/createCourse`, {
                 title: title,
                 description: description,
                 published: true, 
                 imgLink: String(imgLink), 
-                price: price
+                price: price, 
+                email: adminEmail
             }, {
                 headers: {
-                    "Content-type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem("token")
+                    "Content-type": "application/json"
                 }
-            });
+            }) : null; 
 
             if(response){ 
                 // window.alert("Added course!");
                 if(response.data.message == 'Course added successfully') { 
                     router.push("/adminui/addcourse/courseadded")
                 } else { 
-                    window.alert("Couldn't add course :( /n pls try again later!"); 
+                    toast.error("Couldn't add course :( /n pls try again later!")
                 }
             } else { 
-                window.alert("An unexpected error occured :( /n pls try again later!");
+                toast.error("An unexpected error occured :( /n pls try again later!")
             }
 
         }}

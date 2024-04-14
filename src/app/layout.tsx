@@ -7,6 +7,8 @@ import RecoidContextProvider from "./recoilContextProvider";
 import { useRecoilValue } from "recoil";
 import { whereIsNav } from "@/store/selectors/whereIsNav";
 import Bar from "./bar";
+import { AuthContextProvider } from "./AuthContext" 
+import { Toaster } from "react-hot-toast"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,15 +25,19 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <body className={inter.className}>  
       <RecoidContextProvider>
-      <body className={inter.className}> 
+        <AuthContextProvider>
+        <Toaster />
         {/* <Appbar /> */}
         {/* {isUser ? <Appbar /> : <AdminAppbar />}  */}
         {/* {!isUser && <AdminAppbar />} */}
         {<Bar />}
         {children}
-      </body> 
+        </AuthContextProvider>
       </RecoidContextProvider>
+      </body> 
+      
     </html>
   );
 }

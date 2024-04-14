@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
 import axios from "axios";
 import { userState } from "@/store/atoms/user"; 
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { courseState } from "@/store/atoms/course";
 import Appbar from "@/components/client/Appbar";
+import { userEmailState } from "@/store/selectors/userEmail";
 
 interface Course {
     id: Number, 
@@ -23,29 +24,27 @@ function Courses() {
     const [email, setEmail] = useState(null); 
     const setUser = useSetRecoilState(userState); 
     const setTheCourse = useSetRecoilState(courseState); 
+    const userEmail = useRecoilValue(userEmailState)
+    const [isLoading, setIsLoading] = useState(true); 
 
     const init = async () => {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-        })
-        setCourses(response.data.courses)
-        setEmail(response.data.email); 
+        const response = userEmail ? await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/courses/${userEmail}`) : null; 
+        setCourses(response?.data.courses)
+        setEmail(response?.data.email); 
         setTheCourse({course: null, isLoading: true});
-        console.log(response.data.courses);
-        console.log('course : ' + response.data.courses[0].imgLink);
-        if(response.data.email){
+        console.log(response?.data.courses);
+        console.log('course : ' + response?.data.courses[0].imgLink);
+        if(response){
             setUser({ 
-                userEmail: response.data.email, 
-                userId: response.data.userId, 
-                isLoading: false 
+                userEmail: userEmail, 
+                isLoading: false, 
             })
+            setIsLoading(false); 
+
         } else{ 
             setUser({ 
                 isLoading: false, 
                 userEmail: null, 
-                userId: null 
             })
         }
     }
@@ -53,6 +52,12 @@ function Courses() {
     useEffect(() => {
         init();
     }, []);
+
+    if (isLoading) { 
+        <div>
+            Loading...
+        </div>
+    }
 
     return <div style={{display: "flex", flexWrap: "wrap", justifyContent: "center"}}>
         {courses.map(course => {
@@ -66,20 +71,6 @@ export function Course({course}) {
     const router = useRouter();
 
     return ( 
-        // <Card style={{
-        //     margin: 10,
-        //     width: 300,
-        //     minHeight: 200,
-        //     padding: 20
-        // }}>
-        //     <Typography textAlign={"center"} variant="h5">{course.title}</Typography>
-        //     <Typography textAlign={"center"} variant="subtitle1">{course.description}</Typography>
-        //     <div style={{display: "flex", justifyContent: "center", marginTop: 20}}>
-        //         <Button variant="contained" size="large" onClick={() => {
-        //             router.push("http://localhost:3000/courses/" + course.id);
-        //         }}>View Course</Button>
-        //     </div>
-        // </Card>
 
         <>
         {/* <Appbar /> */}
@@ -118,21 +109,5 @@ export function Course({course}) {
     )
 
 }
-
-{/* <Card style={{
-        margin: 10,
-        width: 300,
-        minHeight: 200,
-        padding: 20
-    }}>
-        <Typography textAlign={"center"} variant="h5">{course.title}</Typography>
-        <Typography textAlign={"center"} variant="subtitle1">{course.description}</Typography>
-        <div style={{display: "flex", justifyContent: "center", marginTop: 20}}>
-            <Button variant="contained" size="large" onClick={() => {
-                router.push("http://localhost:3000/courses/" + course.id);
-            }}>Buy</Button>
-        </div>
-    </Card> */}
-    {/* <img src={course.imageLink} style={{width: 300}} ></img> */}
 
 export default Courses;

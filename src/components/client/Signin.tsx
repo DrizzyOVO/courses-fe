@@ -1,19 +1,37 @@
 "use client" 
 import Button from '@mui/material/Button';
 import TextField from "@mui/material/TextField";
-import {Card, Typography, Box} from "@mui/material";
+import {Card, Typography, Box, duration} from "@mui/material";
 import {useState} from "react";
 import axios from "axios";
 import { useRouter } from 'next/navigation'
 import { userState } from '@/store/atoms/user'; 
 import { useSetRecoilState } from 'recoil';
-import { toast } from 'react-toast';
+import { z } from "zod"; 
+import { UserAuth } from '@/app/AuthContext';
+import toast from 'react-hot-toast';
+
+const signinInput = z.object({ 
+    email: z.string().max(50).min(5).email(), 
+    password: z.string().min(2)
+}); 
 
 function Signin() {
     const router = useRouter(); 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const setUser = useSetRecoilState(userState); 
+
+    const { user, googleSignIn, emailPassSignIn, emailPassSignUp, signOut } = UserAuth();  
+
+    const handleSignIn = async (email: string, password: string) => { 
+        try { 
+            await emailPassSignIn(email, password); 
+            router.push("/courses");
+        } catch(error) { 
+            console.log(error); 
+        }
+    }
 
     return <div>   
 
@@ -46,58 +64,27 @@ function Signin() {
                                     type="password" placeholder="Password" />
                                 <button
 
-                                    onClick={async () => {
+                                    onClick={
+                                        async () => {   
 
-                                        toast.success("Please hold on, while we connect to our backend"); 
-                                        
-                                        const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/login`, {
-                                            email: email,
-                                            password: password
-                                        }, {
-                                            headers: {
-                                                "Content-type": "application/json"
+                                            try { 
+                                                const parsedInput = signinInput.safeParse({email, password}); 
+                                    
+                                                if(!parsedInput.success) {
+                                                    toast.error('invalid email / password \n password length more the 6 characters!', {duration: 4000})
+                                                } else { 
+                                                    toast.loading("Please hold on, while we connect to our backend", {duration: 7000});
+                                                    await handleSignIn(email, password); 
+                                                } 
+                                
+                                            } catch(error) { 
+                                
+                                                toast.error('something went wrong')  
+                                
                                             }
-                                        }); 
-                                        // const data = res.data;
-                                        if(res) { 
-                                    
-                                            if (res.data.message == "Logged in successfully"){
-
-                                                localStorage.setItem("token", res.data.token);
-                                                setUser({ 
-                                                    userEmail: res.data.email,  
-                                                    isLoading: false, 
-                                                    userId: res.data.userId 
-                                                })
-                                                router.push("/courses");
-                                    
-                                            } else if (res.data.message == 'Invalid username or password' || "Incorrect password" ){ 
-                                    
-                                                toast.error('Invalid username or password') 
-                                                setUser({ 
-                                                    userEmail: null,   
-                                                    isLoading: false, 
-                                                    userId: null 
-                                                })
-                                    
-                                            } else { 
-                                                window.alert('Try again!');  
-                                                setUser({ 
-                                                    userEmail: null,   
-                                                    isLoading: false, 
-                                                    userId: null 
-                                                })
-                                            }
-                                        } else { 
-                                            
-                                            window.alert('Try again!');  
-                                            setUser({ 
-                                                userEmail: null,   
-                                                isLoading: false, 
-                                                userId: null 
-                                            })
+                                
                                         }
-                                    }}
+                                    }
 
                                     className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                                     <svg className="w-6 h-6 -ml-2" fill="none" stroke="currentColor" stroke-width="2"

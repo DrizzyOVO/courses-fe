@@ -10,6 +10,8 @@ import {useRecoilState, useRecoilValue, useRecoilValue_TRANSITION_SUPPORT_UNSTAB
 import { courseTitle, coursePrice, isCourseLoading, courseDetails, courseDescription, courseImage } from '@/store/selectors/course';
 import { useRouter } from 'next/navigation';
 import Router from 'next/router';
+import { adminEmailState } from '@/store/selectors/adminEmail';
+import toast from 'react-hot-toast';
 // import { useRouter } from 'next/router';
 
 function Course({ params } : {params : any}) {
@@ -18,41 +20,19 @@ function Course({ params } : {params : any}) {
     const courseLoading = useRecoilValue(isCourseLoading);
     const courseReady = useRecoilValue(courseDetails); 
     const router = useRouter(); 
-
-    // useEffect(() => {
-
-    //     console.log(courseId);
-    //     async function smth(){
-    //     await axios.get(`http://localhost:5000/admin/courses/${courseId}`, {
-    //         headers: {
-    //             "Authorization": "Bearer " + localStorage.getItem("token")
-    //         }
-    //     }).then(res => {
-    //         setCourse({isLoading: false, course: res.data.course});
-    //     })
-    //     .catch(e => {
-    //         setCourse({isLoading: false, course: null});
-    //     });
-    //   }
-    //   smth(); 
-    // }, []);
-
+    const adminEmail = useRecoilValue(adminEmailState); 
 
     useEffect(() => {
         
         setTimeout(() => {
         async function smth() {
             console.log(courseId);  
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/courses/${courseId}`, { 
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                }
-            }); 
+            const response = adminEmail ? await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/courses/${courseId}/getone`) : null; 
 
             if(response){ 
-            setCourse({isLoading: false, course: response.data.course});
+                setCourse({isLoading: false, course: response.data.course});
             } else {
-            setCourse({isLoading: false, course: null});
+                setCourse({isLoading: false, course: null});
             }
         }
         smth(); 
@@ -98,6 +78,7 @@ function GrayTopper() {
 function UpdateCard({courseId} : {courseId: string}) {
     const router = useRouter(); 
     const [courseDetails, setCourse] = useRecoilState(courseState);
+    const adminEmail = useRecoilValue(adminEmailState); 
     console.log(courseDetails);
 
     const [title, setTitle] = useState(courseDetails?.course?.title);
@@ -165,11 +146,11 @@ function UpdateCard({courseId} : {courseId: string}) {
                         description: description,
                         imgLink: String(image),
                         published: true,
-                        price: price 
+                        price: price, 
+                        email: adminEmail 
                     }, {
                         headers: {
-                            "Content-type": "application/json",
-                            "Authorization": "Bearer " + localStorage.getItem("token")
+                            "Content-type": "application/json"
                         }
                     });
                     let updatedCourse = {
@@ -186,7 +167,7 @@ function UpdateCard({courseId} : {courseId: string}) {
                       setCourse({course: null, isLoading: true});
                       router.push(`/adminui/courses/${courseId}/updated`)
                     } else { 
-                        window.alert("Couldn't update the course :( /n pls try again later")
+                        toast.error("Couldn't update the course :( /n pls try again later")
                     }
                 }}
             >Update course</button>
@@ -227,35 +208,10 @@ function Price() {
             Price:
         </Typography>
         <Typography variant="subtitle1">
-            <b>&nbsp;Rs {price.toString()} </b>
+            <b>&nbsp;$ {price.toString()} </b>
         </Typography>
     </div>
 }
 
 export default Course;
-
-
-
-
-
-
-  // useEffect(() => {
-  //   async function smth() {
-
-  //       const response = await axios.get(`http://localhost:5000/admin/courses/${courseId}`, { 
-  //           headers: {
-  //               "Authorization": "Bearer " + localStorage.getItem("token")
-  //           }
-  //       }); 
-
-  //       if(response.data.message == "course found") { 
-  //         setUserid(response.data.adminId); 
-  //         setCourse(response.data.course); 
-  //         setUser(response.data.theUser); 
-  //       }
-
-  //   }
-  //   smth(); 
-
-  // }, []);
 
