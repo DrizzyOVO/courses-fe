@@ -8,6 +8,12 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { courseState } from "@/store/atoms/course";
 import Appbar from "@/components/client/Appbar";
 import { userEmailState } from "@/store/selectors/userEmail";
+import {
+    PushSpinner, TraceSpinner, RainbowSpinner,
+    RingSpinner, SwishSpinner, PongSpinner,
+    MetroSpinner, JellyfishSpinner
+}
+    from "react-spinners-kit";
 
 interface Course {
     id: Number, 
@@ -54,9 +60,10 @@ function Courses() {
     }, []);
 
     if (isLoading) { 
-        <div>
-            Loading...
-        </div>
+        return <div className="spinner flex justify-center mt-56">
+                    <RingSpinner size={150} color="indigo"
+                        backColor="white" loading={isLoading} />
+                </div>
     }
 
     return <div style={{display: "flex", flexWrap: "wrap", justifyContent: "center"}}>

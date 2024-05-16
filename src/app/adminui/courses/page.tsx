@@ -10,6 +10,12 @@ import { courseInterfaceUi } from "@/store/atoms/course";
 import { userEmailState } from "@/store/selectors/userEmail";
 import { adminEmailState } from "@/store/selectors/adminEmail";
 import { adminState } from "@/store/atoms/admin";
+import {
+    PushSpinner, TraceSpinner, RainbowSpinner,
+    RingSpinner, SwishSpinner, PongSpinner,
+    MetroSpinner, JellyfishSpinner
+}
+    from "react-spinners-kit";
 
 
 function PurchasedCourses() {
@@ -19,6 +25,7 @@ function PurchasedCourses() {
     const router = useRouter(); 
     const setTheCourse = useSetRecoilState(courseState); 
     const adminEmail = useRecoilValue(adminEmailState);
+    let [loading, setLoading] = useState(true); 
     // const typeofthis<> : courseInterfaceUi = {}
 
     type typeofthis = courseInterfaceUi; 
@@ -36,18 +43,28 @@ function PurchasedCourses() {
                     adminEmail: response.data.email,  
                     isLoading: false, 
                 });  
+                setLoading(false)
             } else{ 
                 setAdmin({ 
                     isLoading: false, 
                     adminEmail: null, 
                 })
+                setLoading(false); 
             }
         }
 
         init();
     }, [setAdmin, setCourses, setEmail, setTheCourse]);
 
-    if(courses.length != 0){
+    if(loading) { 
+
+        return <div className="spinner flex justify-center mt-56">
+                    <RingSpinner size={150} color="indigo"
+                        backColor="white" loading={loading} />
+                </div>
+
+    } 
+    else if(courses.length != 0){
         return <div style={{display: "flex", flexWrap: "wrap", justifyContent: "center"}}>
         {courses.map(course => {
             return <Course course={course} />}

@@ -7,6 +7,7 @@ import { userState } from "@/store/atoms/user";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import Appbar from "@/components/client/Appbar";
 import { userEmailState } from "@/store/selectors/userEmail";
+import { RingSpinner } from "react-spinners-kit";
 
 
 function PurchasedCourses() {
@@ -26,17 +27,16 @@ function PurchasedCourses() {
         }
         if(response?.data.email){
             setUser({ 
-                userEmail: userEmail, 
+                userEmail: response?.data.email, 
                 isLoading: false, 
             })
-            if(response.data.course) { 
-                setIsLoading(false);
-            }
+            setIsLoading(false);
         } else{ 
             setUser({ 
                 isLoading: false, 
                 userEmail: null, 
-            })
+            }); 
+            setIsLoading(false);
         }
     }
 
@@ -45,15 +45,15 @@ function PurchasedCourses() {
     }, []);
 
     if(isLoading) { 
-        <div>
-            Loading... 
-        </div>
+        return <div className="spinner flex justify-center mt-56">
+                    <RingSpinner size={150} color="indigo"
+                        backColor="white" loading={isLoading} />
+                </div>
     }
 
-    if(courses.length != 0){
+    else if(courses.length != 0){
         return (
             <>
-            <Appbar />
             <div style={{display: "flex", flexWrap: "wrap", justifyContent: "center", marginTop: '20px'}}> 
                 {courses.map(course => {
                     return <Course key={course.id} course={course} />} 

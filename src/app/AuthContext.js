@@ -14,6 +14,8 @@ import { userState } from "@/store/atoms/user";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { adminState } from "@/store/atoms/admin";
+import { whereIsNav } from "@/store/selectors/whereIsNav";
+import { navUser } from "@/store/atoms/nav";
 
 const AuthContext = createContext();
 
@@ -22,6 +24,8 @@ export const AuthContextProvider = ({ children }) => {
   const setTheUser = useSetRecoilState(userState); 
   const navigate = useRouter(); 
   const setAdmin = useSetRecoilState(adminState); 
+  const isUser = useRecoilValue(whereIsNav); 
+  const setNav = useSetRecoilState(navUser); 
 
   const googleSignIn = async () => { 
     const provider = new GoogleAuthProvider();
@@ -107,14 +111,29 @@ export const AuthContextProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log('currentUser :- ' + currentUser.email);
-      setUser(currentUser);
-      setTheUser({ 
-        isLoading: false, 
-        userEmail: currentUser.email
-      })
+      if(currentUser.email === 'gaurav@gmail.com') { 
+        setUser(currentUser)
+        setAdmin({ 
+          isLoading: false, 
+          adminEmail: currentUser.email
+        }); 
+        setNav({
+          isUser: false
+        })
+      } else { 
+        setUser(currentUser);
+        setTheUser({ 
+          isLoading: false, 
+          userEmail: currentUser.email
+        }); 
+        setNav({
+          isUser: true
+        })
+      }
+      
     });
     return () => unsubscribe();
-  }, [user]);
+  }, [user, onAuthStateChanged, setAdmin, setTheUser, setNav]);
 
   return (
     <AuthContext.Provider value={{ user, googleSignIn, emailPassSignIn, emailPassSignUp, emailPassSignInAdmin, logOut }}>

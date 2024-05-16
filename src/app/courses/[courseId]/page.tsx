@@ -13,6 +13,7 @@ import Image from 'next/image'
 import Appbar from "@/components/client/Appbar";
 import { userEmailState } from "@/store/selectors/userEmail";
 import { checkout } from "../../checkout"
+import { RingSpinner } from "react-spinners-kit";
 
 
 interface Course {
@@ -75,9 +76,10 @@ function Course({ params } : {params : any}) {
     }
 
     if(isLoading) { 
-      <div>
-        Loading...
-      </div>
+      return <div className="spinner flex justify-center mt-56">
+                    <RingSpinner size={150} color="indigo"
+                        backColor="white" loading={isLoading} />
+                </div>
     }
 
     return (
@@ -110,8 +112,10 @@ function Course({ params } : {params : any}) {
                     let key = ""
                     if (course?.title == "Ui/Ux") { 
                       key = `${process.env.NEXT_PUBLIC_UI_UX}`
-                    } else if (course?.title == "LaFerrari") { 
-                      key = `${process.env.NEXT_PUBLIC_LAFERRARI}`
+                    } else if (course?.title == "Webflow") { 
+                      key = `${process.env.NEXT_PUBLIC_WEBFLOW}`
+                    } else if (course?.title == "System Design") { 
+                      key = `${process.env.NEXT_PUBLIC_SYSTEM_DESIGN}`
                     } else { 
                       key = `${process.env.NEXT_PUBLIC_WEBSITE_DEVELOPMENT}`
                     }
@@ -133,9 +137,14 @@ function Course({ params } : {params : any}) {
               // </form>
             } 
           </div>
+          {
+            user ? <></> : 
+
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <h1>use <span className="text-indigo-600 font-bold">4242 4242 4242 4242</span> in card section while buying for testing purpose!</h1>
+            <h1>use <span className="text-indigo-600 font-bold">4242 4242 4242 4242</span> in card section while buying the Course!</h1>
           </div>
+          
+          }
         </div>
     </div>
     </>

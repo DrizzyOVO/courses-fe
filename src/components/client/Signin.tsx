@@ -27,7 +27,7 @@ function Signin() {
     const handleSignIn = async (email: string, password: string) => { 
         try { 
             await emailPassSignIn(email, password); 
-            router.push("/courses");
+            await router.push("/");
         } catch(error) { 
             console.log(error); 
         }

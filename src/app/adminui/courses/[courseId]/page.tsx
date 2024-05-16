@@ -12,10 +12,12 @@ import { useRouter } from 'next/navigation';
 import Router from 'next/router';
 import { adminEmailState } from '@/store/selectors/adminEmail';
 import toast from 'react-hot-toast';
+import { RingSpinner } from 'react-spinners-kit';
 // import { useRouter } from 'next/router';
 
 function Course({ params } : {params : any}) {
     let courseId  = params.courseId;
+    const [isLoading, setIsLoading] = useState(true); 
     const setCourse = useSetRecoilState(courseState);
     const courseLoading = useRecoilValue(isCourseLoading);
     const courseReady = useRecoilValue(courseDetails); 
@@ -31,8 +33,10 @@ function Course({ params } : {params : any}) {
 
             if(response){ 
                 setCourse({isLoading: false, course: response.data.course});
+                setIsLoading(false)
             } else {
                 setCourse({isLoading: false, course: null});
+                setIsLoading(false)
             }
         }
         smth(); 
@@ -42,7 +46,10 @@ function Course({ params } : {params : any}) {
 
 
     if (courseLoading) {
-        return <>Loading...</>
+        return <div className="spinner flex justify-center mt-56">
+        <RingSpinner size={150} color="indigo"
+            backColor="white" loading={isLoading} />
+    </div>
     }
 
     // return (

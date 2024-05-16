@@ -1,9 +1,12 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
+import { useRecoilValue } from 'recoil';
+import { userEmailState } from '@/store/selectors/userEmail';
 
 const Landing = () => { 
 
   const navigate = useRouter(); 
+  const userEmail = useRecoilValue(userEmailState); 
 
   return (
   <>
@@ -25,7 +28,7 @@ const Landing = () => {
 
     </div>
     
-    <div className='grid grid-cols-1 sm:grid-cols-2 bg-gray-200 py-36'>
+    {!userEmail && <div className='grid grid-cols-1 sm:grid-cols-2 bg-gray-200 py-36'>
 
       <div className='m-auto'>
           <img src="https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg" className="relative rounded-2xl" alt="food illustration" loading="lazy" width="500" height="600" />
@@ -48,7 +51,7 @@ const Landing = () => {
                 </h3>
       </div>
 
-    </div>
+    </div>}
 
   </>
 
